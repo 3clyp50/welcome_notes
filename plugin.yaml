@@ -1,0 +1,8 @@
+name: welcome_notes
+title: Welcome Notes
+description: Movable, resizable notes for your welcome screen and chats.
+version: 1.0.0
+settings_sections:
+  - external
+per_project_config: false
+per_agent_config: false

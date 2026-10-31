@@ -1,0 +1,86 @@
+<html>
+<head>
+  <title>Welcome Notes</title>
+  <link rel="stylesheet" href="/plugins/welcome_notes/webui/notes.css">
+  <script type="module" src="/plugins/welcome_notes/webui/notes-store.js"></script>
+</head>
+<body>
+  <div x-data x-destroy="$store.welcomeNotes?.reload()">
+    <template x-if="config">
+      <div x-init="Object.assign(config, $store.welcomeNotes.normalizeAppearance(config))">
+        <fieldset class="wn-theme-field">
+          <legend class="field-title">Theme</legend>
+          <div class="wn-theme-options">
+            <template x-for="theme in $store.welcomeNotes.themes" :key="theme.id">
+              <label class="wn-theme-option" :class="{ selected: (config.theme || 'agent_zero') === theme.id }">
+                <span class="wn-paper wn-theme-preview" :data-note-theme="theme.id" :style="$store.welcomeNotes.themeStyle(config)" aria-hidden="true">
+                  <span class="wn-paper-top"><span class="wn-preview-actions"><x-icon name="delete"></x-icon><x-icon name="close"></x-icon></span></span>
+                  <span class="wn-note-text">Monday
+Review the sketches.
+Keep the best idea.</span>
+                  <span class="wn-resize"></span>
+                </span>
+                <span class="wn-theme-label"><input type="radio" name="welcome-notes-theme" :value="theme.id" :checked="(config.theme || 'agent_zero') === theme.id" @change="config.theme = theme.id"><span x-text="theme.name"></span></span>
+              </label>
+            </template>
+          </div>
+        </fieldset>
+        <div class="wn-paper-settings" x-show="config.theme === 'paper'">
+          <div class="field">
+            <div class="field-label"><label class="field-title" for="welcome-notes-paper-color">Note colour</label></div>
+            <div class="field-control wn-colour-control"><input id="welcome-notes-paper-color" type="color" x-model="config.paper_color"><span x-text="config.paper_color"></span></div>
+          </div>
+          <div class="field">
+            <div class="field-label"><label class="field-title" for="welcome-notes-text-color">Text colour</label></div>
+            <div class="field-control wn-colour-control"><input id="welcome-notes-text-color" type="color" x-model="config.text_color"><span x-text="config.text_color"></span></div>
+          </div>
+          <div class="field">
+            <div class="field-label"><label class="field-title" for="welcome-notes-random">Random pastels</label></div>
+            <div class="field-control wn-pastel-control">
+              <label class="toggle"><input id="welcome-notes-random" type="checkbox" x-model="config.random_pastels"><span class="toggler"></span></label>
+              <span class="wn-pastels" aria-hidden="true"><template x-for="colour in $store.welcomeNotes.pastels" :key="colour"><span :style="{ backgroundColor: colour }"></span></template></span>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label"><label class="field-title" for="welcome-notes-scope">Notes</label></div>
+          <div class="field-control"><select id="welcome-notes-scope" x-model="config.scope"><option value="shared">Shared</option><option value="chat">Per chat</option></select></div>
+        </div>
+        <div class="field" x-data="{ recording: false }">
+          <div class="field-label"><label class="field-title" for="welcome-notes-shortcut">New note shortcut</label></div>
+          <div class="field-control">
+            <input id="welcome-notes-shortcut" data-note-shortcut type="text" readonly autocomplete="off" spellcheck="false"
+              :value="recording ? 'Press keys' : $store.welcomeNotes.shortcutLabel(config.shortcut).join(' + ')"
+              @focus="recording = true" @blur="recording = false"
+              @keydown="if ($store.welcomeNotes.recordShortcut($event, config)) { recording = false; $el.blur(); }" />
+          </div>
+        </div>
+      </div>
+    </template>
+  </div>
+  <style>
+    .wn-theme-field { border: 0; padding: 0; margin: 0 0 1.5rem; min-width: 0; }
+    .wn-theme-field legend { margin-bottom: 0.75rem; padding: 0; }
+    .wn-theme-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem; }
+    .wn-theme-option { display: flex; flex-direction: column; gap: 0.85rem; padding: 0.75rem; min-width: 0; background: var(--color-background); border: 1px solid var(--color-border); border-radius: 10px; cursor: pointer; }
+    .wn-theme-option.selected { border-color: var(--color-highlight); background: color-mix(in srgb, var(--color-highlight) 6%, var(--color-background)); }
+    .wn-theme-option:focus-within { outline: 2px solid var(--color-highlight); outline-offset: 3px; }
+    .wn-theme-option .wn-theme-preview { position: relative; width: 100%; height: 155px; font-size: 12px; pointer-events: none; box-shadow: 0 3px 9px #0002; }
+    .wn-theme-preview .wn-paper-top { flex-basis: 28px; }
+    .wn-theme-preview .wn-note-text { padding: 12px 14px; overflow: hidden; }
+    .wn-preview-actions { display: flex; gap: 8px; margin-left: auto; opacity: 0.55; }
+    .wn-preview-actions x-icon { font-size: 14px; }
+    .wn-theme-label { display: flex; align-items: center; gap: 0.5rem; color: var(--color-text); font-size: 0.9rem; }
+    .wn-theme-label input[type="radio"] { appearance: none; flex-shrink: 0; width: 17px; height: 17px; margin: 0; padding: 0; border: 1px solid var(--color-text-muted); border-radius: 4px; background: var(--color-background); cursor: pointer; }
+    .wn-theme-label input[type="radio"]:checked { background: var(--color-highlight); border-color: var(--color-highlight); }
+    .wn-theme-label input[type="radio"]:checked::after { content: ''; display: block; width: 4px; height: 8px; margin: 2px 0 0 5px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+    .wn-paper-settings { margin-bottom: 1.25rem; }
+    .wn-colour-control, .wn-pastel-control { display: flex; align-items: center; gap: 0.75rem; }
+    .wn-colour-control input[type="color"] { width: 44px; height: 36px; flex: 0 0 44px; padding: 3px; border: 1px solid var(--color-border); border-radius: 6px; cursor: pointer; background: transparent; }
+    .wn-colour-control span { color: var(--color-text-muted); font-family: monospace; font-size: 0.85rem; }
+    .wn-pastels { display: flex; gap: 4px; }
+    .wn-pastels > span { width: 15px; height: 15px; border-radius: 50%; border: 1px solid #0002; }
+    @media (max-width: 620px) { .wn-theme-options { grid-template-columns: 1fr; } .wn-theme-option .wn-theme-preview { height: 128px; } }
+  </style>
+</body>
+</html>

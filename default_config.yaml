@@ -1,0 +1,6 @@
+scope: shared
+shortcut: Alt+Shift+N
+theme: agent_zero
+paper_color: '#f6e7ac'
+text_color: '#3b3423'
+random_pastels: false

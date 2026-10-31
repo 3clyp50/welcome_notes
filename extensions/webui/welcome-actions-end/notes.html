@@ -1,0 +1,65 @@
+<html>
+<head><script type="module" src="/plugins/welcome_notes/webui/notes-store.js"></script></head>
+<body>
+  <div x-data>
+    <template x-if="$store.welcomeNotes">
+      <template x-teleport=".welcome-board, .welcome-lower-grid">
+        <section class="wn-card" data-welcome-block="welcome_notes.list" data-welcome-label="Notes"
+          :data-welcome-size="$store.welcomeNotes.wide ? 'full' : 'half'" x-show="!$store.welcomeNotes.hidden"
+          x-create="$store.welcomeNotes.welcomeMount()">
+          <header class="welcome-panel-header">
+            <h2>Notes</h2>
+            <div class="welcome-panel-actions">
+              <button type="button" class="welcome-panel-icon-button" x-show="$store.welcomeNotes.list.length" aria-label="New note" title="New note" :disabled="!$store.welcomeNotes.ready" @click="$store.welcomeNotes.create()"><x-icon name="add"></x-icon></button>
+              <button type="button" class="welcome-panel-icon-button" aria-label="Notes settings" title="Notes settings" @click="$store.welcomeNotes.settings()"><x-icon name="settings"></x-icon></button>
+              <button type="button" class="welcome-panel-icon-button" x-show="typeof $store.welcomeStore.mountLayout === 'function'" :aria-label="$store.welcomeNotes.wide ? 'Use half-width notes panel' : 'Expand notes panel'" @click="$store.welcomeNotes.toggleWidth()"><x-icon :name="$store.welcomeNotes.wide ? 'close_fullscreen' : 'open_in_full'"></x-icon></button>
+              <button type="button" data-welcome-handle></button>
+              <button type="button" class="welcome-panel-icon-button" aria-label="Dismiss Notes" @click="$store.welcomeNotes.dismiss()"><x-icon name="close"></x-icon></button>
+            </div>
+          </header>
+          <div class="wn-empty" x-show="!$store.welcomeNotes.list.length">
+            <button type="button" class="btn" :disabled="!$store.welcomeNotes.ready" @click="$store.welcomeNotes.create()"><x-icon name="add"></x-icon>New note</button>
+          </div>
+          <ul class="wn-list" aria-label="Notes" x-show="$store.welcomeNotes.list.length" :aria-busy="$store.welcomeNotes.loading">
+            <template x-for="note in $store.welcomeNotes.list" :key="note.id">
+              <li>
+                <button type="button" class="wn-list-open" @click="$store.welcomeNotes.open(note)">
+                  <x-icon name="sticky_note_2"></x-icon>
+                  <span class="wn-list-copy"><span class="wn-list-title" x-text="$store.welcomeNotes.title(note)"></span><small x-show="$store.welcomeNotes.mode === 'chat'" x-text="$store.welcomeNotes.scopeLabel(note)"></small></span>
+                </button>
+                <button type="button" class="welcome-panel-icon-button wn-list-delete" :aria-label="'Delete ' + $store.welcomeNotes.title(note)" title="Delete note" :disabled="Boolean(note.deleting)" @click="$confirmClick($event, () => $store.welcomeNotes.remove(note))"><x-icon name="delete"></x-icon></button>
+              </li>
+            </template>
+          </ul>
+          <div class="wn-shortcut"><span>New note</span><span class="wn-keys"><template x-for="key in $store.welcomeNotes.shortcutKeys" :key="key"><kbd x-text="key"></kbd></template></span></div>
+        </section>
+      </template>
+    </template>
+  </div>
+  <style>
+    .welcome-lower-grid .wn-card { grid-column: 1 / -1; }
+    .welcome-lower-grid .wn-card [data-welcome-handle] { display: none; }
+    .wn-card { min-width: 0; padding: 1.35rem; background: var(--color-panel); border: 1px solid color-mix(in srgb, var(--color-border) 66%, transparent); border-radius: 8px; display: flex; flex-direction: column; gap: 1rem; }
+    .wn-card .welcome-panel-header { margin: 0; }
+    .wn-empty { min-height: 104px; display: grid; place-items: center; flex: 1; }
+    .wn-empty .btn { display: inline-flex; align-items: center; gap: 0.45rem; }
+    .wn-empty x-icon { font-size: 1.1rem; }
+    .wn-list { list-style: none; padding: 0; margin: 0; min-height: 104px; max-height: 16rem; overflow-y: auto; overscroll-behavior: contain; }
+    .wn-list li { display: flex; align-items: center; min-width: 0; border-radius: 5px; }
+    .wn-list li:hover, .wn-list li:focus-within { background: var(--color-background-hover); }
+    .wn-list-open { display: flex; align-items: center; gap: 0.7rem; flex: 1; min-width: 0; padding: 0.65rem 0.35rem; border: 0; border-radius: 4px; color: var(--color-text); background: transparent; font: inherit; text-align: left; cursor: pointer; }
+    .wn-list-open:focus-visible { outline: 1px solid var(--color-text-secondary); outline-offset: -1px; }
+    .wn-list-open > x-icon { color: var(--color-text-secondary); font-size: 1.2rem; flex-shrink: 0; }
+    .wn-list-copy { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
+    .wn-list-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.9rem; }
+    .wn-list-copy small { color: var(--color-text-muted); font-size: 0.75rem; }
+    .wn-list-delete { opacity: 0; }
+    .wn-list li:hover .wn-list-delete, .wn-list li:focus-within .wn-list-delete { opacity: 1; }
+    .wn-shortcut { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; border-top: 1px solid color-mix(in srgb, var(--color-border) 66%, transparent); padding-top: 0.8rem; color: var(--color-text-muted); font-size: 0.8rem; }
+    .wn-keys { display: flex; gap: 0.25rem; }
+    .wn-keys kbd { font: inherit; color: inherit; padding: 0.15rem 0.35rem; background: transparent; border: 1px solid var(--color-border); border-radius: 4px; box-shadow: none; }
+    @media (pointer: coarse) { .wn-card .welcome-panel-icon-button { min-width: 36px; min-height: 44px; } .wn-list-delete { opacity: 1; } }
+    @media (max-width: 480px) { .wn-card { padding: 1rem; } }
+  </style>
+</body>
+</html>

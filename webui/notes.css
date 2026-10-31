@@ -1,0 +1,56 @@
+.wn-owner { display: contents; }
+.wn-layer { position: fixed; inset: 0; z-index: 900; pointer-events: none; }
+.wn-paper {
+  --wn-surface: var(--color-panel); --wn-ink: var(--color-text);
+  --wn-edge: color-mix(in srgb, var(--color-border) 66%, transparent);
+  position: absolute; display: flex; flex-direction: column; box-sizing: border-box; pointer-events: auto;
+  margin: 0; padding: 0; overflow: hidden; border: 1px solid var(--wn-edge); border-radius: 10px;
+  background-color: var(--wn-surface);
+  box-shadow: 0 8px 24px #0003, 0 1px 3px #0002;
+  color: var(--wn-ink); font-family: "Rubik", Arial, Helvetica, sans-serif; font-size: 16px; line-height: 1.55;
+  cursor: grab; touch-action: none; user-select: none;
+  transition: box-shadow 140ms ease;
+}
+.wn-paper:focus-visible { outline: 2px solid var(--wn-ink); outline-offset: 3px; }
+.wn-paper:focus-within { box-shadow: 0 10px 28px #0004, 0 1px 3px #0002; }
+.wn-paper.is-moving { cursor: grabbing; box-shadow: 0 18px 38px #0005; }
+.wn-paper.is-editing { touch-action: auto; }
+.wn-paper-top { display: flex; align-items: center; flex: 0 0 36px; padding: 3px 6px; box-sizing: border-box; border-bottom: 1px solid var(--wn-edge); touch-action: none; }
+.wn-paper[data-note-theme="agent_zero"] .wn-paper-top::before { content: ''; width: 16px; height: 3px; margin-left: 10px; border-radius: 2px; background: var(--color-highlight); }
+.wn-paper[data-note-theme="paper"] {
+  --wn-surface: var(--wn-paper-color, #f6e7ac); --wn-ink: var(--wn-paper-ink, #3b3423);
+  --wn-edge: color-mix(in srgb, var(--wn-ink) 18%, var(--wn-surface));
+  border-radius: 3px 3px 14px 3px;
+  background-image: linear-gradient(175deg, #fff4 0%, transparent 45%), repeating-linear-gradient(92deg, #6c500003 0px, #6c500003 1px, transparent 1px, transparent 3px);
+}
+.wn-paper[data-note-theme="paper"] .wn-paper-top { background: color-mix(in srgb, var(--wn-ink) 4%, transparent); border-bottom-color: transparent; }
+.wn-paper[data-note-theme="notebook"] { --wn-surface: #f5f6f2; --wn-ink: #34444e; --wn-edge: #c7d0d0; border-radius: 4px 10px 10px 4px; }
+.wn-paper[data-note-theme="notebook"] .wn-paper-top { background: #e6ebe6; }
+.wn-paper[data-note-theme="notebook"] .wn-note-text, .wn-paper[data-note-theme="notebook"] textarea.wn-editor {
+  background-image: linear-gradient(to right, transparent 10px, #bc777733 10px 11px, transparent 11px), repeating-linear-gradient(to bottom, transparent 0 calc(1.55em - 1px), #6f94ab33 calc(1.55em - 1px) 1.55em);
+  background-position: 0 0, 0 12px;
+}
+.wn-note-actions { display: flex; gap: 2px; margin-left: auto; opacity: 0; transition: opacity 140ms ease; }
+.wn-paper:hover .wn-note-actions, .wn-paper:focus-within .wn-note-actions { opacity: 1; }
+.wn-note-button { display: inline-grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 4px; color: inherit; background: transparent; cursor: pointer; font: inherit; }
+.wn-note-button > x-icon { font-size: 17px; }
+.wn-note-button:hover, .wn-note-button:focus-visible { background: color-mix(in srgb, var(--wn-ink) 9%, transparent); }
+.wn-note-button:focus-visible { outline: 1px solid currentColor; outline-offset: -2px; }
+.wn-save-error { color: var(--wn-ink); }
+.wn-note-text, .wn-paper textarea.wn-editor {
+  display: block; flex: 1; box-sizing: border-box; width: 100%; min-width: 0; min-height: 0; margin: 0;
+  padding: 12px 18px 24px; color: inherit; background: transparent; border: 0; border-radius: 0;
+  font: inherit; line-height: inherit; white-space: pre-wrap; overflow-wrap: anywhere; overflow-y: auto;
+}
+.wn-note-text { touch-action: none; }
+.wn-paper textarea.wn-editor { outline: none; box-shadow: none; resize: none; cursor: text; touch-action: pan-y; user-select: text; }
+.wn-resize { position: absolute; right: 0; bottom: 0; width: 26px; height: 26px; border: 0; border-radius: 0; background: transparent; color: inherit; cursor: nwse-resize; touch-action: none; padding: 0; }
+.wn-resize::after { content: ''; position: absolute; right: 5px; bottom: 6px; width: 11px; height: 11px; background: repeating-linear-gradient(135deg, transparent 0 3px, color-mix(in srgb, var(--wn-ink) 40%, transparent) 3px 4px); clip-path: polygon(100% 0, 100% 100%, 0 100%); }
+.wn-resize:focus-visible { outline: 1px solid currentColor; outline-offset: -4px; }
+@media (hover: none), (pointer: coarse) {
+  .wn-note-actions { opacity: 1; }
+  .wn-paper-top { flex-basis: 44px; }
+  .wn-note-button { width: 38px; height: 38px; }
+  .wn-resize { width: 38px; height: 38px; }
+}
+@media (prefers-reduced-motion: reduce) { .wn-paper, .wn-note-actions { transition: none; } }

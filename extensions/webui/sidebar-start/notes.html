@@ -1,0 +1,49 @@
+<html>
+<head><link rel="stylesheet" href="/plugins/welcome_notes/webui/notes.css"><script type="module" src="/plugins/welcome_notes/webui/notes-store.js"></script></head>
+<body>
+  <div x-data class="wn-owner">
+    <template x-if="$store.welcomeNotes">
+      <div class="wn-owner" x-create="$store.welcomeNotes.mount($el)" x-destroy="$store.welcomeNotes.cleanup($el)"
+        x-effect="$store.welcomeNotes.setContext($store.chats?.selected || '')">
+        <template x-teleport="body">
+          <div class="wn-layer" x-show="$store.welcomeNotes.ready">
+            <template x-for="note in $store.welcomeNotes.visible" :key="note.id">
+              <article class="wn-paper" tabindex="0" role="group" aria-roledescription="note"
+                :aria-label="'Note: ' + $store.welcomeNotes.title(note)" aria-description="Drag to move. Enter to edit. Arrow keys move the note."
+                :data-note-theme="$store.welcomeNotes.appearance.theme" :data-note-id="note.id" :style="$store.welcomeNotes.noteStyle(note)" :inert="Boolean(note.deleting)"
+                :class="{ 'is-editing': $store.welcomeNotes.editingId === note.id, 'is-moving': $store.welcomeNotes.gesture?.note.id === note.id && $store.welcomeNotes.gesture?.moved }"
+                @pointerdown="$store.welcomeNotes.startGesture(note, $event)"
+                @pointermove="$store.welcomeNotes.moveGesture($event)"
+                @pointerup="$store.welcomeNotes.endGesture($event)"
+                @pointercancel="$store.welcomeNotes.endGesture($event, true)"
+                @lostpointercapture="$store.welcomeNotes.endGesture($event, true)"
+                @keydown="$store.welcomeNotes.noteKey(note, $event)"
+                @click="$store.welcomeNotes.click(note, $event)">
+                <div class="wn-paper-top">
+                  <button type="button" class="wn-note-button wn-save-error" x-show="note.saveFailed" aria-label="Retry saving note" title="Retry saving note" @click.stop="$store.welcomeNotes.flush(note)"><x-icon name="sync_problem"></x-icon></button>
+                  <div class="wn-note-actions">
+                    <button type="button" class="wn-note-button" aria-label="Delete note" title="Delete note" @click.stop="$confirmClick($event, () => $store.welcomeNotes.remove(note))"><x-icon name="delete"></x-icon></button>
+                    <button type="button" class="wn-note-button" aria-label="Close note" title="Close note" @click.stop="$store.welcomeNotes.hide(note)"><x-icon name="close"></x-icon></button>
+                  </div>
+                </div>
+                <template x-if="$store.welcomeNotes.editingId !== note.id">
+                  <div class="wn-note-text" x-text="note.text"></div>
+                </template>
+                <template x-if="$store.welcomeNotes.editingId === note.id">
+                  <textarea class="wn-editor" aria-label="Note text" maxlength="10000" spellcheck="true" x-model="note.text"
+                    @input="$store.welcomeNotes.changed(note)" @blur="$store.welcomeNotes.finishEdit(note.id)"
+                    @keydown.escape.stop.prevent="$store.welcomeNotes.finishEdit(note.id); $el.closest('[data-note-id]').focus()"></textarea>
+                </template>
+                <button type="button" class="wn-resize" aria-label="Resize note" title="Resize note"
+                  @pointerdown.stop="$store.welcomeNotes.startGesture(note, $event, 'resize')"
+                  @keydown.stop="$store.welcomeNotes.noteKey(note, $event, 'resize')"></button>
+              </article>
+            </template>
+          </div>
+        </template>
+      </div>
+    </template>
+  </div>
+
+</body>
+</html>
