@@ -27,19 +27,19 @@ Keep the best idea.</span>
         </fieldset>
         <div class="wn-paper-settings" x-show="config.theme === 'paper'">
           <div class="field">
+            <div class="field-label"><label class="field-title" for="welcome-notes-random">Random pastels</label></div>
+            <div class="field-control wn-pastel-control">
+              <label class="toggle"><input id="welcome-notes-random" type="checkbox" x-model="config.random_pastels"><span class="toggler"></span></label>
+              <span class="wn-pastels" aria-hidden="true"><template x-for="colour in $store.welcomeNotes.pastels" :key="colour"><span :style="{ backgroundColor: colour }"></span></template></span>
+            </div>
+          </div>
+          <div class="field">
             <div class="field-label"><label class="field-title" for="welcome-notes-paper-color">Note colour</label></div>
             <div class="field-control wn-colour-control"><input id="welcome-notes-paper-color" type="color" x-model="config.paper_color"><span x-text="config.paper_color"></span></div>
           </div>
           <div class="field">
             <div class="field-label"><label class="field-title" for="welcome-notes-text-color">Text colour</label></div>
             <div class="field-control wn-colour-control"><input id="welcome-notes-text-color" type="color" x-model="config.text_color"><span x-text="config.text_color"></span></div>
-          </div>
-          <div class="field">
-            <div class="field-label"><label class="field-title" for="welcome-notes-random">Random pastels</label></div>
-            <div class="field-control wn-pastel-control">
-              <label class="toggle"><input id="welcome-notes-random" type="checkbox" x-model="config.random_pastels"><span class="toggler"></span></label>
-              <span class="wn-pastels" aria-hidden="true"><template x-for="colour in $store.welcomeNotes.pastels" :key="colour"><span :style="{ backgroundColor: colour }"></span></template></span>
-            </div>
           </div>
         </div>
         <div class="field">

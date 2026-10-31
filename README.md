@@ -30,7 +30,7 @@ Open the gear in the Notes panel or the plugin's configuration in Plugins.
 **Theme** offers three selectable cards with live previews:
 
 - **Agent Zero** (default): a modern panel using A0's colours, border and blue accent. It follows the app's light/dark mode.
-- **Paper**: textured sticky notes with configurable **Note colour** and **Text colour**. **Random pastels** assigns a pastel to each newly created Paper note; that colour stays with the note. Turning the toggle off makes new notes use the selected note colour. Existing pastel notes retain their colours.
+- **Paper**: textured sticky notes with configurable **Note colour** and **Text colour**. The **Random pastels** toggle appears directly below the theme previews, only when Paper is selected. It assigns a pastel to each newly created Paper note; that colour stays with the note. Turning it off makes new notes use the selected note colour. Existing pastel notes retain their colours.
 - **Notebook**: pale ruled paper with a quiet margin line.
 
 Theme changes apply to all notes without changing their text, size, position or chat. Colour controls update the Paper preview as you choose them; **Save** applies your settings. Existing notes without an assigned pastel use the configured Paper colour.
