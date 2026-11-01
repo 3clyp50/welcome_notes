@@ -42,7 +42,9 @@
     .wn-card { min-width: 0; padding: 1.35rem; background: var(--color-panel); border: 1px solid color-mix(in srgb, var(--color-border) 66%, transparent); border-radius: 8px; display: flex; flex-direction: column; gap: 1rem; }
     .wn-card .welcome-panel-header { margin: 0; }
     .wn-empty { min-height: 104px; display: grid; place-items: center; flex: 1; }
-    .wn-empty .btn { display: inline-flex; align-items: center; gap: 0.45rem; }
+    .wn-empty .btn { display: inline-flex; align-items: center; gap: 0.45rem; background: var(--color-highlight); color: white; }
+    .wn-empty .btn:hover { background-color: color-mix(in srgb, var(--color-highlight) 80%, black); }
+    .wn-empty .btn:active { background-color: color-mix(in srgb, var(--color-highlight) 65%, black); }
     .wn-empty x-icon { font-size: 1.1rem; }
     .wn-list { list-style: none; padding: 0; margin: 0; min-height: 104px; max-height: 16rem; overflow-y: auto; overscroll-behavior: contain; }
     .wn-list li { display: flex; align-items: center; min-width: 0; border-radius: 5px; }
