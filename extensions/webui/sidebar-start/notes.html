@@ -6,16 +6,16 @@
       <div class="wn-owner" x-create="$store.welcomeNotes.mount($el)" x-destroy="$store.welcomeNotes.cleanup($el)"
         x-effect="$store.welcomeNotes.setContext($store.chats?.selected || '')">
         <template x-teleport="body">
-          <div class="wn-layer" x-show="$store.welcomeNotes.ready">
+          <div class="wn-layer" x-show="$store.welcomeNotes.ready"
+            @pointermove.window.capture="$store.welcomeNotes.moveGesture($event)"
+            @pointerup.window.capture="$store.welcomeNotes.endGesture($event)"
+            @pointercancel.window.capture="$store.welcomeNotes.endGesture($event, true)">
             <template x-for="note in $store.welcomeNotes.visible" :key="note.id">
               <article class="wn-paper" tabindex="0" role="group" aria-roledescription="note"
                 :aria-label="'Note: ' + $store.welcomeNotes.title(note)" aria-description="Drag to move. Enter to edit. Arrow keys move the note."
                 :data-note-theme="$store.welcomeNotes.appearance.theme" :data-note-id="note.id" :style="$store.welcomeNotes.noteStyle(note)" :inert="Boolean(note.deleting)"
                 :class="{ 'is-editing': $store.welcomeNotes.editingId === note.id, 'is-moving': $store.welcomeNotes.gesture?.note.id === note.id && $store.welcomeNotes.gesture?.moved }"
                 @pointerdown="$store.welcomeNotes.startGesture(note, $event)"
-                @pointermove="$store.welcomeNotes.moveGesture($event)"
-                @pointerup="$store.welcomeNotes.endGesture($event)"
-                @pointercancel="$store.welcomeNotes.endGesture($event, true)"
                 @lostpointercapture="$store.welcomeNotes.endGesture($event, true)"
                 @keydown="$store.welcomeNotes.noteKey(note, $event)"
                 @click="$store.welcomeNotes.click(note, $event)">

@@ -230,3 +230,32 @@ test('pastel assignment happens once at creation and survives editing and reload
   assert.equal(t.store.notes[0].color, color);
   t.cleanup();
 });
+
+function resizeEvent(captureFails = false) {
+  const element = { setPointerCapture() { if (captureFails) throw new Error('Capture unavailable'); }, hasPointerCapture: () => false };
+  return { button: 0, buttons: 1, isPrimary: true, pointerId: 1, clientX: 100, clientY: 100,
+    target: { closest: () => null }, currentTarget: { closest: () => element }, preventDefault() {} };
+}
+
+test('notes can expand and finish resizing when pointer capture is unavailable', async () => {
+  const t = await setup(); const note = await create(t), event = resizeEvent(true);
+  note.x = 100; note.y = 100;
+  t.store.startGesture(note, event, 'resize');
+  t.store.moveGesture({ ...event, clientX: 200, clientY: 180 });
+  assert.equal(note.width, 372); assert.equal(note.height, 340);
+  t.store.endGesture({ ...event, buttons: 0 });
+  assert.equal(t.store.gesture, null);
+  await t.store.flush(note); assert.equal(t.rows.get(note.id).width, 372);
+  t.cleanup();
+});
+
+test('a missed release cannot resize a note on subsequent mouse hover', async () => {
+  const t = await setup(); const note = await create(t), event = resizeEvent();
+  note.x = 100; note.y = 100;
+  t.store.startGesture(note, event, 'resize');
+  t.store.moveGesture({ ...event, clientX: 150, clientY: 150 });
+  t.store.moveGesture({ ...event, buttons: 0, clientX: 50, clientY: 50 });
+  assert.equal(t.store.gesture, null); assert.equal(note.width, 322); assert.equal(note.height, 310);
+  await t.store.flush(note); assert.equal(t.rows.get(note.id).width, 322);
+  t.cleanup();
+});

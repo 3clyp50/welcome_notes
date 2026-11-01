@@ -286,12 +286,13 @@ export const store = createStore('welcomeNotes', {
     this.activeId = note.id; this.suppressClick = '';
     const element = event.currentTarget.closest('[data-note-id]');
     this.gesture = { note, element, pointer: event.pointerId, kind, x: event.clientX, y: event.clientY, start: fitRect(note, this.viewport), original: { x: note.x, y: note.y, width: note.width, height: note.height }, moved: false };
-    element.setPointerCapture(event.pointerId);
+    try { element.setPointerCapture(event.pointerId); } catch { /* Window listeners keep the gesture usable if capture is unavailable. */ }
     if (kind === 'resize') event.preventDefault();
   },
   moveGesture(event) {
     const gesture = this.gesture;
     if (!gesture || event.pointerId !== gesture.pointer) return;
+    if (event.buttons === 0) { this.endGesture(event); return; }
     const dx = event.clientX - gesture.x, dy = event.clientY - gesture.y;
     if (!gesture.moved && Math.hypot(dx, dy) < 6) return;
     gesture.moved = true; event.preventDefault();
